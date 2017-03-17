@@ -71,25 +71,29 @@ class shopShoplogisticsPlugin extends shopPlugin
               $str .= '<option value="'.$value.'" '.$selected.' >'.$value.'</option>';
             }
           $str .= '</select>';
+        $add_info = '';
+          if (!empty($sl_order)) {
+              $errors_str = ($sl_order['errors'] != '') ? '<br><font color="red">Ошибки: '.$sl_order['errors'].'</font>' : '';
 
-          $errors_str = ($sl_order['errors'] != '') ? '<br><font color="red">Ошибки: '.$sl_order['errors'].'</font>' : '';
-          $str .= '<input type="button"  id="shopLogisitcs_button_send" value=" Отправить в ShopLogistics " OnClick="sendOrderToShopLogisitcs(\'send\');">
-                   <br><br><input type="button"  id="shopLogisitcs_button_post_send" value=" Отправить как почтовую в SL " OnClick="sendOrderToShopLogisitcs(\'post_send\');">
-                  ';
-          if (isset($sl_order['id']))
-            {
-              if ($sl_order['type'] == 'post')
-                {
-                   $add_info = '<b>Почтовая доставка</b><br><b>Статус:</b> '.$sl_order['status'].'
+              if (isset($sl_order['id']))
+              {
+                  if ($sl_order['type'] == 'post')
+                  {
+                      $add_info = '<b>Почтовая доставка</b><br><b>Статус:</b> '.$sl_order['status'].'
                    <br><b>Статус почты:</b> '.$sl_order['post_status'] . $errors_str;
-                }
-              else
-                {
-                   $add_info = '<b>Статус:</b> '.$sl_order['status'].'
+                  }
+                  else
+                  {
+                      $add_info = '<b>Статус:</b> '.$sl_order['status'].'
                    <br><b>Филиал получатель:</b> '.$sl_order['current_filial'].'
                    <br><b>Текущий филиал:</b> '.$sl_order['reciver_filial']. $errors_str;
-                }
-            }
+                  }
+              }
+          }
+
+        $str .= '<input type="button"  id="shopLogisitcs_button_send" value=" Отправить в ShopLogistics " OnClick="sendOrderToShopLogisitcs(\'send\');">
+                   <br><br><input type="button"  id="shopLogisitcs_button_post_send" value=" Отправить как почтовую в SL " OnClick="sendOrderToShopLogisitcs(\'post_send\');">
+                  ';
 
           $str .= '</div>
                    <div id="shop_logistics_div_status" style="padding:5px;">'.$add_info.'
