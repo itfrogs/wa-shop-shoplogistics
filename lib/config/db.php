@@ -16,6 +16,11 @@
         'delivery_date' => array('date', 'null' => 0),
         'delivery_time_from' => array('time', 'null' => 0),
         'delivery_time_to' => array('time', 'null' => 0),
+        'partial_ransom' => array('int', 11, 'null' => 0),
+        'delivery_price_for_customer' => array('varchar', 255, 'null' => 0),
+        'delivery_price_porog_for_customer' => array('varchar', 255, 'null' => 0),
+        'delivery_discount_for_customer' => array('varchar', 255, 'null' => 0),
+        'delivery_discount_porog_for_customer' => array('varchar', 255, 'null' => 0),
         ':keys' => array(
             'PRIMARY' => 'id',
         ),

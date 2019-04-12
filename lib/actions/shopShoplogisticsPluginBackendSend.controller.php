@@ -120,6 +120,14 @@ class shopShoplogisticsPluginBackendSendController extends waJsonController
          $time_from = waRequest::request('time_from');
          $time_to = waRequest::request('time_to');
 
+         $partial_ransom = waRequest::request('partial_ransom');
+         $is_paid = waRequest::request('is_paid');
+
+         $delivery_price_for_customer = waRequest::request('delivery_price_for_customer');
+         $delivery_price_porog_for_customer = waRequest::request('delivery_price_porog_for_customer');
+         $delivery_discount_for_customer = waRequest::request('delivery_discount_for_customer');
+         $delivery_discount_porog_for_customer = waRequest::request('delivery_discount_porog_for_customer');
+
          $order = shopPayment::getOrderData($order_id, $this);
 
          $contact = new waContact($order->contact_id);
@@ -189,11 +197,13 @@ class shopShoplogisticsPluginBackendSendController extends waJsonController
             $child2 = $dom->createElement("phone_sms",$contact->get('phone','default'));
             $delivery->appendChild($child2);
 
-            $price = ($order->params['payment_plugin'] == '' || $order->params['payment_plugin'] == 'cash') ? $order->total : 0;
+            $price = ($is_paid == 0) ? $order->total : 0;
             $child2 = $dom->createElement("price",$price);
             $delivery->appendChild($child2);
 
-            $child2 = $dom->createElement("ocen_price",$order->subtotal);
+            $tax = (isset($order->tax)) ? $order->tax : 0;
+            $ocen_price = ($is_paid == 0) ? $order->subtotal+$tax : $order->total;
+            $child2 = $dom->createElement("ocen_price",$ocen_price);
             $delivery->appendChild($child2);
 
             $child2 = $dom->createElement("site_name",$settings['site_name']);
@@ -212,14 +222,33 @@ class shopShoplogisticsPluginBackendSendController extends waJsonController
             $child2 = $dom->createElement("additional_info",$order->comment);
             $delivery->appendChild($child2);
 
+            $child2 = $dom->createElement("partial_ransom",$partial_ransom);
+            $delivery->appendChild($child2);
+
+            $child2 = $dom->createElement("delivery_price_for_customer",$delivery_price_for_customer);
+            $delivery->appendChild($child2);
+
+            $child2 = $dom->createElement("delivery_price_porog_for_customer",$delivery_price_porog_for_customer);
+            $delivery->appendChild($child2);
+
+            $child2 = $dom->createElement("delivery_discount_for_customer",$delivery_discount_for_customer);
+            $delivery->appendChild($child2);
+
+            $child2 = $dom->createElement("delivery_discount_porog_for_customer",$delivery_discount_porog_for_customer);
+            $delivery->appendChild($child2);
+
+
             if ($settings['products_list'] == 1) {
 
             $child2 = $dom->createElement("products");
             $delivery->appendChild($child2);
 
-
             for ($i = 0; $i < count($order->items); $i++)
               {
+              	$price = ($is_paid == 0) ? $order->items[$i]['price'] : 0;
+
+              	$nds = (isset($settings['nds'])) ? $settings['nds'] : '';
+
               	$child3 = $dom->createElement("product");
                 $child2->appendChild($child3);
 
@@ -232,10 +261,17 @@ class shopShoplogisticsPluginBackendSendController extends waJsonController
               	$child4 = $dom->createElement("quantity",$order->items[$i]['quantity']);
                 $child3->appendChild($child4);
 
-              	$child4 = $dom->createElement("item_price",$order->items[$i]['price']);
+              	$child4 = $dom->createElement("item_price",$price);
+                $child3->appendChild($child4);
+
+                $child4 = $dom->createElement("ocen_price",$order->items[$i]['price']);
+                $child3->appendChild($child4);
+
+              	$child4 = $dom->createElement("nds",$nds);
                 $child3->appendChild($child4);
               }
             }
+
 
         $xml_content = $this->sendRequest($dom->saveXML());
         try {
@@ -316,9 +352,12 @@ class shopShoplogisticsPluginBackendSendController extends waJsonController
 
          $order_id = waRequest::request('order_id', null, waRequest::TYPE_INT);
 
+         $is_paid = waRequest::request('is_paid');
+
          $order = shopPayment::getOrderData($order_id, $this);
 
          $contact = new waContact($order->contact_id);
+
 
          $model = new shopShoplogisticsModel();
          $sl_order = $model->getByField('order_id', $order_id);
@@ -375,11 +414,14 @@ class shopShoplogisticsPluginBackendSendController extends waJsonController
             $child2 = $dom->createElement("nested_type",'разное');
             $delivery->appendChild($child2);
 
-            $price = ($order->params['payment_plugin'] == '' || $order->params['payment_plugin'] == 'cash') ? $order->total : 0;
+            $price = ($is_paid == 0) ? $order->total : 0;
             $child2 = $dom->createElement("cash_on_delivery",$price);
             $delivery->appendChild($child2);
 
-            $child2 = $dom->createElement("valuably",$order->subtotal);
+            $tax = (isset($order->tax)) ? $order->tax : 0;
+            $ocen_price = ($is_paid == 0) ? $order->subtotal+$tax : $order->total;
+
+            $child2 = $dom->createElement("valuably",$ocen_price);
             $delivery->appendChild($child2);
 
             $child2 = $dom->createElement("post_service",'Почта');

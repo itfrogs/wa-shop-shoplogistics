@@ -49,4 +49,11 @@ return array(
         'control_type' => 'text',
         'subject'      => 'shoplogistics',
     ),
+    'nds'              => array(
+        'value'        => '',
+        'title'        => '%НДС по умолчанию',
+        'description'  => '',
+        'control_type' => 'text',
+        'subject'      => 'shoplogistics',
+    ),
 );
